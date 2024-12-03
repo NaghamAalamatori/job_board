@@ -1,11 +1,16 @@
-step "deploy-a-release" {
-    name = "Deploy a Release"
+step "run-a-script" {
+    name = "Run a Script"
+    properties = {
+        Octopus.Action.TargetRoles = "job-board-targets"
+    }
 
     action {
-        action_type = "Octopus.DeployRelease"
+        action_type = "Octopus.Script"
         properties = {
-            Octopus.Action.DeployRelease.DeploymentCondition = "Always"
-            Octopus.Action.DeployRelease.ProjectId = "job-board"
+            Octopus.Action.GitRepository.Source = "Project"
+            Octopus.Action.RunOnServer = "false"
+            Octopus.Action.Script.ScriptFileName = "readme"
+            Octopus.Action.Script.ScriptSource = "GitRepository"
         }
         worker_pool_variable = ""
     }
