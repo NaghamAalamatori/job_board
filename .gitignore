@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+/front end/node_modules/
+/back end/node_modules/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Build outputs
+/dist
+/build
+/front end/dist
+/back end/dist
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Cache directories
+.cache/
+.npm/
+.eslintcache
+
+# Test coverage
+/coverage
+
+# Temporary files
+*.tmp
+*.temp
+jobs.json
+
+# Optional: Database files
+*.sqlite
+*.db
+
+# Optional: OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

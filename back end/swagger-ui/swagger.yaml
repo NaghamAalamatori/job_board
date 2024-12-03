@@ -1,0 +1,300 @@
+openapi: 3.0.0
+info:
+  title: Job Board API
+  version: 1.0.0
+  description: API documentation for the Job Board application.
+servers:
+  - url: http://localhost:5000/api
+paths:
+  /admin/users:
+    get:
+      summary: Get all users
+      description: Retrieves a list of all users (job seekers and employers). Admin-only access.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "403":
+          description: Not authorized
+        "500":
+          description: Server error
+
+  /admin/users/{id}:
+    delete:
+      summary: Delete a user
+      description: Deletes a user by ID. Admin-only access.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the user to delete
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User deleted
+        "403":
+          description: Not authorized
+        "404":
+          description: User not found
+        "500":
+          description: Server error
+
+  /applications:
+    post:
+      summary: Submit a job application
+      description: Submits a job application with a resume.
+      tags:
+        - Applications
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                jobId:
+                  type: string
+                userId:
+                  type: string
+                coverLetter:
+                  type: string
+                resume:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Application created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "500":
+          description: Server error
+
+  /jobs:
+    get:
+      summary: Get all jobs
+      description: Retrieves all jobs with optional filters and sorting.
+      tags:
+        - Jobs
+      parameters:
+        - name: keyword
+          in: query
+          description: Keyword to search job titles
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: Job location filter
+          schema:
+            type: string
+        - name: salaryRange
+          in: query
+          description: Salary range filter (e.g., "50000-100000")
+          schema:
+            type: string
+        - name: remote
+          in: query
+          description: Filter for remote jobs (true/false)
+          schema:
+            type: boolean
+        - name: jobType
+          in: query
+          description: Type of job filter (e.g., "full-time")
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sort by field and order (e.g., "title:asc")
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+        "500":
+          description: Server error
+
+    post:
+      summary: Post a new job
+      description: Allows authenticated users to post a new job listing.
+      tags:
+        - Jobs
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Job"
+            example:
+              title: "Frontend Developer"
+              description: "Develop and maintain user interfaces."
+              location: "Remote"
+              salaryRange: "60000-80000"
+              applicationDeadline: "2024-12-31"
+              remote: true
+              jobType: "Full-time"
+      responses:
+        "201":
+          description: Job posted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "400":
+          description: Bad request (invalid input)
+        "401":
+          description: Unauthorized (missing or invalid token)
+        "500":
+          description: Server error
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        salaryRange:
+          type: string
+        applicationDeadline:
+          type: string
+          format: date
+        remote:
+          type: boolean
+        jobType:
+          type: string
+    Application:
+      type: object
+      properties:
+        id:
+          type: string
+        jobId:
+          type: string
+        userId:
+          type: string
+        resume:
+          type: string
+        coverLetter:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  /admin/analytics:
+    get:
+      summary: View platform metrics
+      description: Retrieves platform-wide metrics. Admin-only access.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Platform analytics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                  totalJobs:
+                    type: integer
+                  totalApplications:
+                    type: integer
+        "403":
+          description: Not authorized
+        "500":
+          description: Server error
+
+  /admin/users:
+    get:
+      summary: List all users
+      description: Retrieves a list of all registered users. Admin-only access.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "403":
+          description: Not authorized
+        "500":
+          description: Server error
+
+  /admin/users/{id}:
+    delete:
+      summary: Manage user accounts
+      description: Deletes a user by ID. Admin-only access.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the user to delete
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User deleted successfully
+        "404":
+          description: User not found
+        "403":
+          description: Not authorized
+        "500":
+          description: Server error
